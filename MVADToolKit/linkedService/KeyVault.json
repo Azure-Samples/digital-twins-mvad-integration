@@ -1,0 +1,11 @@
+{
+    "name": "ADT_AnomalyDetector_KeyVault",
+    "type": "Microsoft.Synapse/workspaces/linkedservices",
+    "properties": {
+        "annotations": [],
+        "type": "AzureKeyVault",
+        "typeProperties": {
+            "baseUrl": "https://<keyvault name>.vault.azure.net/"
+        }
+    }
+}

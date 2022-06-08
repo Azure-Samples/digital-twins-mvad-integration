@@ -1,0 +1,16 @@
+{
+    "name": "ADT_Data_History",
+    "type": "Microsoft.Synapse/workspaces/linkedservices",
+    "properties": {
+        "annotations": [],
+        "type": "AzureDataExplorer",
+        "typeProperties": {
+            "endpoint": "<your kusto endpoint>",
+            "database": "<database name>"
+        },
+        "connectVia": {
+            "referenceName": "AutoResolveIntegrationRuntime",
+            "type": "IntegrationRuntimeReference"
+        }
+    }
+}

@@ -1,0 +1,353 @@
+{
+    "name": "consolidated_inference_pipeline",
+    "properties": {
+        "activities": [
+            {
+                "name": "Inference",
+                "type": "SynapseNotebook",
+                "dependsOn": [
+                    {
+                        "activity": "Set Start Time",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "Set End Time",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "Set Inference Window Start Time",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 2,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "notebook": {
+                        "referenceName": "consolidated_inference",
+                        "type": "NotebookReference"
+                    },
+                    "parameters": {
+                        "start_time": {
+                            "value": {
+                                "value": "@variables('start_time')",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "end_time": {
+                            "value": {
+                                "value": "@variables('end_time')",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "kusto_database": {
+                            "value": {
+                                "value": "@pipeline().parameters.kusto_database",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "scenario_name": {
+                            "value": {
+                                "value": "@pipeline().parameters.scenario_name",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "adls_container": {
+                            "value": {
+                                "value": "@pipeline().parameters.adls_container",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "adt_endpoint": {
+                            "value": {
+                                "value": "@pipeline().parameters.adt_endpoint",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "adx_table": {
+                            "value": {
+                                "value": "@pipeline().parameters.adx_table",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "customer_adt_query": {
+                            "value": {
+                                "value": "@pipeline().parameters.customer_adt_query",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "relevant_metrics": {
+                            "value": {
+                                "value": "@join(pipeline().parameters.relevant_metrics, ',')",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "kv_name": {
+                            "value": {
+                                "value": "@pipeline().parameters.kv_name",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "mvad_region": {
+                            "value": {
+                                "value": "@pipeline().parameters.mvad_region",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "mvad_model_id": {
+                            "value": {
+                                "value": "@pipeline().parameters.mvad_model_id",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "training_args": {
+                            "value": {
+                                "value": "@pipeline().parameters.training_args",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "inference_start": {
+                            "value": {
+                                "value": "@variables('inference_start')",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "resampling_rate": {
+                            "value": {
+                                "value": "@pipeline().parameters.resampling_rate",
+                                "type": "Expression"
+                            },
+                            "type": "int"
+                        },
+                        "sliding_window": {
+                            "value": {
+                                "value": "@pipeline().parameters.sliding_window",
+                                "type": "Expression"
+                            },
+                            "type": "int"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "Set Start Time",
+                "type": "SetVariable",
+                "dependsOn": [],
+                "userProperties": [],
+                "typeProperties": {
+                    "variableName": "start_time",
+                    "value": {
+                        "value": "@getPastTime(15, 'Minute')",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "Set End Time",
+                "type": "SetVariable",
+                "dependsOn": [],
+                "userProperties": [],
+                "typeProperties": {
+                    "variableName": "end_time",
+                    "value": {
+                        "value": "@getPastTime(5, 'Minute')",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "Set Inference Window Start Time",
+                "type": "SetVariable",
+                "dependsOn": [],
+                "userProperties": [],
+                "typeProperties": {
+                    "variableName": "inference_start",
+                    "value": {
+                        "value": "@getPastTime(add(15, mul(pipeline().parameters.sliding_window, pipeline().parameters.resampling_rate)), 'Minute')",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "Check Halt Inference Triggers",
+                "type": "IfCondition",
+                "dependsOn": [
+                    {
+                        "activity": "Inference",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "expression": {
+                        "value": "@contains(last(split(activity('Inference').output.status.Output.result.exitValue, ';')), '[HaltSubsequentInferenceRuns]')",
+                        "type": "Expression"
+                    },
+                    "ifTrueActivities": [
+                        {
+                            "name": "Stop Inference Trigger When No Valid MVAD Model",
+                            "type": "WebActivity",
+                            "dependsOn": [],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "url": {
+                                    "value": "@concat('https://', pipeline().DataFactory, '.dev.azuresynapse.net/triggers/', pipeline().TriggerName, '/stop?api-version=2020-12-01')",
+                                    "type": "Expression"
+                                },
+                                "connectVia": {
+                                    "referenceName": "AutoResolveIntegrationRuntime",
+                                    "type": "IntegrationRuntimeReference"
+                                },
+                                "method": "POST",
+                                "body": "{body:None}",
+                                "authentication": {
+                                    "type": "MSI",
+                                    "resource": "https://dev.azuresynapse.net/"
+                                }
+                            }
+                        },
+                        {
+                            "name": "Throw No Model Found Error",
+                            "type": "Fail",
+                            "dependsOn": [],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "message": {
+                                    "value": "No valid MVAD model found for inference, stopping future triggers for this scenario inference run",
+                                    "type": "Expression"
+                                },
+                                "errorCode": "400"
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "name": "Check Inference Notebook Failure",
+                "type": "IfCondition",
+                "dependsOn": [
+                    {
+                        "activity": "Inference",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "expression": {
+                        "value": "@equals(first(split(activity('Inference').output.status.Output.result.exitValue, ';')), 'Failure')",
+                        "type": "Expression"
+                    },
+                    "ifTrueActivities": [
+                        {
+                            "name": "Throw Failure Message",
+                            "type": "Fail",
+                            "dependsOn": [],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "message": {
+                                    "value": "@last(split(activity('Inference').output.status.Output.result.exitValue, ';'))",
+                                    "type": "Expression"
+                                },
+                                "errorCode": "400"
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "parameters": {
+            "adls_account": {
+                "type": "string"
+            },
+            "adls_container": {
+                "type": "string"
+            },
+            "kusto_database": {
+                "type": "string"
+            },
+            "scenario_name": {
+                "type": "string"
+            },
+            "kv_name": {
+                "type": "string"
+            },
+            "adt_endpoint": {
+                "type": "string"
+            },
+            "adx_table": {
+                "type": "string"
+            },
+            "customer_adt_query": {
+                "type": "string"
+            },
+            "relevant_metrics": {
+                "type": "array"
+            },
+            "mvad_region": {
+                "type": "string"
+            },
+            "mvad_model_id": {
+                "type": "string"
+            },
+            "training_args": {
+                "type": "string"
+            },
+            "resampling_rate": {
+                "type": "int"
+            },
+            "sliding_window": {
+                "type": "int"
+            }
+        },
+        "variables": {
+            "start_time": {
+                "type": "String"
+            },
+            "end_time": {
+                "type": "String"
+            },
+            "inference_start": {
+                "type": "String"
+            }
+        },
+        "annotations": [],
+        "lastPublishTime": "2022-03-21T17:57:17Z"
+    },
+    "type": "Microsoft.Synapse/workspaces/pipelines"
+}
