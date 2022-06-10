@@ -1,0 +1,68 @@
+experiment_name: 'v12_010121_020121'
+profiles_included: ['continuous', 'categorical', 'monotonic', 'binary']
+plot: False
+save: True
+timestamp_noise: &timestamp_noise False
+seed: 5
+data_history_format: True
+
+#############################################################################################
+
+init_graph_kwargs:
+  relationship_to_flow: 'isParent'
+  simulated_nodes: ['A', 'B']
+
+simulate_anomaly_labels_kwargs:
+  num_simulated_anomaly_ts: 1
+  time_range_lst: [['2021-01-01 00:00:00', '2021-02-01 00:00:00']]
+  freq_lst: ['1min']
+  start_of_day_range_lst: [['07:00:00', '09:00:00']]
+  end_of_day_range_lst: [['16:00:00', '17:00:00']]
+  surge_occurrence_range_lst: [[10, 10]]
+  surge_length_range_lst: [[100, 100]]
+
+simulate_ts_kwargs_continuous:
+  'unique_anomaly_label': True
+  'simulate_surge_lst_lst': [[True, True], [True, True], [True, True]]
+  'surge_ratio_range_lst_lst': [[[5, 10], [5, 10]], [[5, 10], [5, 10]], [[5, 10], [5, 10]]]
+  'normal_mean_range_lst_lst': [[[6, 7], [26, 27]], [[6, 7], [26, 27]], [[6, 7], [26, 27]]]
+  'normal_std_lst_lst': [[0.5, 0.5], [0.5, 0.5], [0.5, 0.5]]
+  'key_name_lst': ['Amps_Ia', 'Amps_Ib', 'Amps_Ic']
+  'missing_ratio_lst': [0.1, 0.1, 0.1]
+  'value_noise_lst': [True, True, True]
+  'timestamp_noise_lst': [*timestamp_noise, *timestamp_noise, *timestamp_noise]
+  'surge_with_decay_lst': [False, False, False]
+
+simulate_ts_kwargs_categorical:
+  'num_simulated_ts': 2
+  'freq_lst': ['1min', '1min']
+  'id_name_lst': ['A', 'B']
+  'key_name_lst': ['PowerLevel', 'PowerLevel']
+  'cat_names_lst': [['High', 'Mid', 'Low'], ['High', 'Mid', 'Low']]
+  'cat_ratio_lst': [[0.333, 0.333, 0.333], [0.333, 0.333, 0.333]]
+  'missing_ratio_lst': [0.8, 0.9]
+  'timestamp_noise_lst': [*timestamp_noise, *timestamp_noise]
+
+simulate_ts_kwargs_monotonic:
+  'unique_anomaly_label': True
+  'simulate_surge_lst_lst': [[True, True]]
+  'surge_ratio_range_lst_lst': [[[5, 10], [5, 10]]]
+  'normal_mean_range_lst_lst': [[[2, 3], [22, 23]]]
+  'normal_std_lst_lst': [[0.5, 0.5]]
+  'key_name_lst': ['PowerMeter']
+  'missing_ratio_lst': [0.1]
+  'value_noise_lst': [True]
+  'timestamp_noise_lst': [*timestamp_noise]
+
+simulate_ts_kwargs_binary:
+  'num_simulated_ts': 2
+  'time_range_lst': [['2021-01-01 00:00:00', '2021-02-01 00:00:00'], ['2021-01-01 00:00:00', '2021-02-01 00:00:00']]
+  'freq_lst': ['5min', '5min']
+  'id_name_lst': ['A', 'B']
+  'key_name_lst': ['Status', 'Status']
+  'start_of_day_range_lst': [['07:00:00', '09:00:00'], ['07:00:00', '09:00:00']]
+  'end_of_day_range_lst': [['16:00:00', '17:00:00'], ['16:00:00', '17:00:00']]
+  'on_occurrence_range_lst': [[100, 100], [100, 100]]
+  'on_length_range_lst': [[5, 10], [5, 10]]
+  'missing_ratio_lst': [0.1, 0.1]
+  'timestamp_noise_lst': [*timestamp_noise, *timestamp_noise]
