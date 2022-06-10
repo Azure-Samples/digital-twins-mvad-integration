@@ -1,0 +1,410 @@
+{
+    "name": "consolidated_training_pipeline",
+    "properties": {
+        "activities": [
+            {
+                "name": "Training",
+                "type": "SynapseNotebook",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "7.00:00:00",
+                    "retry": 2,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "notebook": {
+                        "referenceName": "consolidated_training",
+                        "type": "NotebookReference"
+                    },
+                    "parameters": {
+                        "start_time": {
+                            "value": {
+                                "value": "@pipeline().parameters.start_time",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "end_time": {
+                            "value": {
+                                "value": "@pipeline().parameters.end_time",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "kusto_database": {
+                            "value": {
+                                "value": "@variables('kusto_database')",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "scenario_name": {
+                            "value": {
+                                "value": "@pipeline().parameters.scenario_name",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "adls_container": {
+                            "value": {
+                                "value": "@variables('adls_container')",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "adt_endpoint": {
+                            "value": {
+                                "value": "@variables('adt_endpoint')",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "adx_table": {
+                            "value": {
+                                "value": "@pipeline().parameters.adx_table",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "customer_adt_query": {
+                            "value": {
+                                "value": "@pipeline().parameters.customer_adt_query",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "relevant_metrics": {
+                            "value": {
+                                "value": "@join(pipeline().parameters.relevant_metrics, ',')",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "kv_name": {
+                            "value": {
+                                "value": "@variables('kv_name')",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "mvad_region": {
+                            "value": {
+                                "value": "@variables('mvad_region')",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "sliding_window": {
+                            "value": {
+                                "value": "@pipeline().parameters.sliding_window",
+                                "type": "Expression"
+                            },
+                            "type": "int"
+                        },
+                        "resampling_rate": {
+                            "value": {
+                                "value": "@pipeline().parameters.resampling_rate",
+                                "type": "Expression"
+                            },
+                            "type": "int"
+                        },
+                        "smoothing": {
+                            "value": {
+                                "value": "@pipeline().parameters.smoothing",
+                                "type": "Expression"
+                            },
+                            "type": "bool"
+                        },
+                        "adx_mapping_Id": {
+                            "value": {
+                                "value": "@pipeline().parameters.adx_mapping_Id",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "adx_mapping_key": {
+                            "value": {
+                                "value": "@pipeline().parameters.adx_mapping_key",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "adx_mapping_value": {
+                            "value": {
+                                "value": "@pipeline().parameters.adx_mapping_value",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        },
+                        "adx_mapping_sourcetime": {
+                            "value": {
+                                "value": "@pipeline().parameters.adx_mapping_sourcetime",
+                                "type": "Expression"
+                            },
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            {
+                "name": "Check Training Notebook Failure",
+                "type": "IfCondition",
+                "dependsOn": [
+                    {
+                        "activity": "Training",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "userProperties": [],
+                "typeProperties": {
+                    "expression": {
+                        "value": "@equals(first(split(activity('Training').output.status.Output.result.exitValue, ';')), 'Failure')",
+                        "type": "Expression"
+                    },
+                    "ifFalseActivities": [
+                        {
+                            "name": "Set MVAD Model ID",
+                            "type": "SetVariable",
+                            "dependsOn": [
+                                {
+                                    "activity": "Set Training Args",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "variableName": "model_id",
+                                "value": {
+                                    "value": "@last(split(activity('Training').output.status.Output.result.exitValue, ';'))",
+                                    "type": "Expression"
+                                }
+                            }
+                        },
+                        {
+                            "name": "Update Trigger Parameters",
+                            "type": "WebActivity",
+                            "dependsOn": [
+                                {
+                                    "activity": "Set MVAD Model ID",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 0,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "url": {
+                                    "value": "@concat(variables('synapse_endpoint'), '/triggers/', pipeline().parameters.scenario_name, 'Trigger10min?api-version=2020-12-01')",
+                                    "type": "Expression"
+                                },
+                                "connectVia": {
+                                    "referenceName": "AutoResolveIntegrationRuntime",
+                                    "type": "IntegrationRuntimeReference"
+                                },
+                                "method": "PUT",
+                                "headers": {
+                                    "Content-Type": "application/json"
+                                },
+                                "body": {
+                                    "value": "{\n    \"properties\": {\n        \"pipelines\": [\n            {\n                \"pipelineReference\": {\n                    \"referenceName\": \"consolidated_inference_pipeline\",\n                    \"type\": \"PipelineReference\"\n                },\n                \"parameters\": {\n                    \"adls_account\": \"@{variables('adls_account')}\",\n                    \"adls_container\": \"@{variables('adls_container')}\",\n                    \"kusto_database\": \"@{variables('kusto_database')}\",\n                    \"scenario_name\": \"@{pipeline().parameters.scenario_name}\",\n                    \"kv_name\": \"@{variables('kv_name')}\",\n                    \"mvad_model_id\": \"@{variables('model_id')}\",\n                    \"adt_endpoint\": \"@{variables('adt_endpoint')}\",\n                    \"adx_table\": \"@{pipeline().parameters.adx_table}\",\n                    \"customer_adt_query\": \"@{pipeline().parameters.customer_adt_query}\",\n                    \"relevant_metrics\": @{pipeline().parameters.relevant_metrics},\n                    \"mvad_region\": \"@{variables('mvad_region')}\",\n                    \"training_args\": \"@{variables('training_args')}\",\n                    \"resampling_rate\": @{pipeline().parameters.resampling_rate},\n                    \"sliding_window\": @{pipeline().parameters.sliding_window}\n                }\n            }\n        ],\n        \"type\": \"ScheduleTrigger\",\n        \"typeProperties\": {\n           \"recurrence\": {\n             \"frequency\": \"Minute\",\n             \"interval\": 10,\n             \"startTime\": \"@{utcnow()}\",\n             \"endTime\": \"@{getFutureTime(3, 'Day')}\",\n             \"timeZone\": \"UTC\"\n            }\n        }\n    }\n}",
+                                    "type": "Expression"
+                                },
+                                "authentication": {
+                                    "type": "MSI",
+                                    "resource": "https://dev.azuresynapse.net/"
+                                }
+                            }
+                        },
+                        {
+                            "name": "Create or Check Metadata Table",
+                            "type": "AzureDataExplorerCommand",
+                            "dependsOn": [
+                                {
+                                    "activity": "Set MVAD Model ID",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 3,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "command": ".create table metadataTable ( scenarioName:string, inputQuery:string, mvadModelId:string, metrics:dynamic, trainingStartTime:datetime, trainingEndTime:datetime, slidingWindow:int32, additionalNote: dynamic)",
+                                "commandTimeout": "00:20:00"
+                            },
+                            "linkedServiceName": {
+                                "referenceName": "ADT_Data_History",
+                                "type": "LinkedServiceReference"
+                            }
+                        },
+                        {
+                            "name": "Write Into Metadata Table",
+                            "type": "AzureDataExplorerCommand",
+                            "dependsOn": [
+                                {
+                                    "activity": "Create or Check Metadata Table",
+                                    "dependencyConditions": [
+                                        "Succeeded"
+                                    ]
+                                }
+                            ],
+                            "policy": {
+                                "timeout": "7.00:00:00",
+                                "retry": 3,
+                                "retryIntervalInSeconds": 30,
+                                "secureOutput": false,
+                                "secureInput": false
+                            },
+                            "userProperties": [],
+                            "typeProperties": {
+                                "command": {
+                                    "value": "@concat('.ingest inline into table metadataTable <|',' \"',pipeline().parameters.scenario_name,'\",\"',pipeline().parameters.customer_adt_query,'\",\"',variables('model_id'),'\",\"[\"\"',join(pipeline().parameters.relevant_metrics, '\"\",\"\"'),'\"\"]\",\"',string(pipeline().parameters.start_time),'\",\"',string(pipeline().parameters.end_time),'\",\"',string(pipeline().parameters.sliding_window),'\",\"',last(take(split(activity('Training').output.status.Output.result.exitValue, ';'), 2)),'\"')",
+                                    "type": "Expression"
+                                },
+                                "commandTimeout": "00:20:00"
+                            },
+                            "linkedServiceName": {
+                                "referenceName": "ADT_Data_History",
+                                "type": "LinkedServiceReference"
+                            }
+                        },
+                        {
+                            "name": "Set Training Args",
+                            "type": "SetVariable",
+                            "dependsOn": [],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "variableName": "training_args",
+                                "value": {
+                                    "value": "@last(take(split(activity('Training').output.status.Output.result.exitValue, ';'), 2))",
+                                    "type": "Expression"
+                                }
+                            }
+                        }
+                    ],
+                    "ifTrueActivities": [
+                        {
+                            "name": "Throw Failure Message",
+                            "type": "Fail",
+                            "dependsOn": [],
+                            "userProperties": [],
+                            "typeProperties": {
+                                "message": {
+                                    "value": "@last(split(activity('Training').output.status.Output.result.exitValue, ';'))",
+                                    "type": "Expression"
+                                },
+                                "errorCode": "400"
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "parameters": {
+            "scenario_name": {
+                "type": "string"
+            },
+            "customer_adt_query": {
+                "type": "string"
+            },
+            "relevant_metrics": {
+                "type": "array"
+            },
+            "start_time": {
+                "type": "string"
+            },
+            "end_time": {
+                "type": "string"
+            },
+            "resampling_rate": {
+                "type": "int",
+                "defaultValue": 1
+            },
+            "sliding_window": {
+                "type": "int"
+            },
+            "smoothing": {
+                "type": "bool"
+            },
+            "adx_table": {
+                "type": "string",
+                "defaultValue": "val"
+            },
+            "adx_mapping_Id": {
+                "type": "string",
+                "defaultValue": "Id"
+            },
+            "adx_mapping_key": {
+                "type": "string",
+                "defaultValue": "Key"
+            },
+            "adx_mapping_value": {
+                "type": "string",
+                "defaultValue": "Value"
+            },
+            "adx_mapping_sourcetime": {
+                "type": "string",
+                "defaultValue": "SourceTimestamp"
+            }
+        },
+        "variables": {
+            "model_id": {
+                "type": "String"
+            },
+            "training_args": {
+                "type": "String"
+            },
+            "adls_account": {
+                "type": "string",
+                "defaultValue": "val"
+            },
+            "adls_container": {
+                "type": "string",
+                "defaultValue": "val"
+            },
+            "kv_name": {
+                "type": "string",
+                "defaultValue": "val"
+            },
+            "adt_endpoint": {
+                "type": "string",
+                "defaultValue": "val"
+            },
+            "synapse_endpoint": {
+                "type": "string",
+                "defaultValue": "val"
+            },
+            "kusto_database": {
+                "type": "string",
+                "defaultValue": "val"
+            },
+            "mvad_region": {
+                "type": "string",
+                "defaultValue": "val"
+            }
+        },
+        "annotations": [],
+        "lastPublishTime": "2022-06-01T18:40:12Z"
+    },
+    "type": "Microsoft.Synapse/workspaces/pipelines"
+}
