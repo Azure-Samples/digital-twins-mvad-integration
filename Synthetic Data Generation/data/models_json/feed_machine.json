@@ -1,0 +1,46 @@
+{
+    "@id": "dtmi:syntheticfactory:feedmachine2;1",
+    "@type": "Interface",
+    "displayName": "feedmachine",
+    "contents": [
+        {
+            "@type": "Property",
+            "name": "Amps_Ia",
+            "displayName": "elec_current_phaseA",
+            "schema": "double",
+            "comment": "1st phase of electrical current flow in machine im Ampere"
+        },
+        {
+            "@type": "Property",
+            "name": "Amps_Ib",
+            "displayName": "elec_current_phaseB",
+            "schema": "double",
+            "comment": "2nd phase of electrical current flow in machine im Ampere"
+        },
+        {
+            "@type": "Property",
+            "name": "Amps_Ic",
+            "displayName": "elec_current_phaseC",
+            "schema": "double",
+            "comment": "3rd phase of electrical current flow in machine im Ampere"
+        },
+        {
+            "@type": "Property",
+            "name": "PowerMeter",
+            "displayName": "elec_power_reading",
+            "schema": "double",
+            "comment": "Power Reading of device in Kilowatt-hour"
+        },
+        {
+            "@type": "Relationship",
+            "name": "isParent"
+        },
+        {
+            "@type": "Relationship",
+            "name": "isRedundant"
+        }
+     ],
+    "@context": "dtmi:dtdl:context;2",
+    "comment": "Assume Amps property will get updated from IoT sensor data stream",
+    "description": "a smaller source node, i.e. smaller machine, which is connected with machines upstream (and potentially downstream) in our synthetic factory"
+  }
