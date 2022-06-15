@@ -10,7 +10,8 @@ This integration toolkit leverages [Azure Data Explorer (ADX)](https://docs.micr
 - For each scenario, running the **training** pipeline so that the AI model learns the scenario's system's **normal behavior** from the historized data. 
 - Running the **inference** pipeline so that the scenario's associated trained AI model can detect **anomalous behavior** in near real-time.
 - Accessing and visualizing the anomaly detection results in an ADX table.
-![synapse workflow](./media/Synapse-workflow.png)
+
+<br>
 
 ## Features
 This project provides the following features:
@@ -26,16 +27,17 @@ This project provides the following features:
     - The configuration and code can easily modified and extended by user to suit their needs
 
 
-* Sample dataset (See [./Synthetic Data Generation/README.md](./MVADToolkit/README.md/#about) for more info):
+* Sample dataset (See the [`Synthetic Data Generation` folder](./Synthetic%20Data%20Generation/README.md/#Intro) for more info):
   - To help you test-drive this toolkit easily, we provide code to prop up sample ADT twins, and synthetically generate sample time-series data.
   - We provide code to pump the sample time-series data as twins' property updates. Alternatively, the time-series can be uploaded to the linked ADX table.
 
+<br>
 
 ## How to use this sample
 
 ### Prerequisites
 
-* To analyze your assets with MVAD, ensure you have an Azure Digital Twins instance that encompasses the target system, ie. cluster of assets ([see the ADT docs for how-to](https://docs.microsoft.com/en-us/azure/digital-twins/overview)) . If you do not have one, set up a sample one according to the [section below](#optional-sample-adt-instance-and-historized-data).
+* To analyze your assets with MVAD, ensure you have an Azure Digital Twins instance that encompasses the target system, ie. cluster of assets ([see the ADT docs for how-to](https://docs.microsoft.com/en-us/azure/digital-twins/overview)) . If you do not have one, set up a sample one according to the [`Synthetic Data Generation` folder](./Synthetic%20Data%20Generation/README.md/#Intro).
 * Ensure you have Owner and Azure Digital Twins Data Reader role in your Azure Digital Twins instance through Azure Portal
 * Ensure you have Owner role in the associated ADX through Azure Portal
 * To run the setup script, install the following modules in Powershell, if you don't already have it installed:
@@ -50,18 +52,24 @@ This project provides the following features:
   - Determine the resources parameters for the Powershell setup script and run the script.
   - Run the PowerShell setup script. This will take 5-10 mins.
   ![synapse resources](./media/Synapse-resources.png)
-- If you are bringing in your own ADT instance, ensure there is an appropriate time-series data source for your MVAD analysis in the ADX table. If you do not have one, set up a sample one according to the [section below](#optional-sample-adt-instance-and-historized-data).
+- If you are bringing in your own ADT instance, ensure there is an appropriate time-series data source for your MVAD analysis in the ADX table. If you do not have one, set up a sample one according to the [`Synthetic Data Generation` folder](./Synthetic%20Data%20Generation/README.md/#Intro).
+
+<br>
 
 ### #TODO Quickstart
+To use the toolkit, we perform the following steps through the Synapse UI:
 - Scenario definition
 - training pipeline run
 - inferencing pipeline run
 - Accessing & visualizing results (optional)
 
-### [Optional] Sample ADT instance and historized data
-See the [toolkit's user-guide](./MVADToolkit/README.md/#user-guide), for more details on how to run a scenario end-to-end.
+![synapse workflow](./media/Synapse-workflow.png)
 
-## Toolkit Demo
+See the [toolkit's user-guide](./MVADToolkit/README.md/#user-guide), for the detailed steps on how to run a scenario end-to-end.
+
+<br>
+
+## #TODO Toolkit Demo
 #TODO: Add demo video
 
 
