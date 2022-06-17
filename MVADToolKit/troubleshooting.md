@@ -11,7 +11,7 @@ See [Azure documentation](https://docs.microsoft.com/en-us/azure/synapse-analyti
 
 <br>
 
-## Resource limitation checks
+## Resource limitation checks 
 
 ### Concurrent read and write capacity of ADX cluster
 
@@ -63,18 +63,18 @@ pool resources should be configured to handle the estimated number of scenarios.
 We have set the default values for these configuration parameters
 in the PowerShell script as follows:
 
-- SparkPoolNodeSize = "Small"
+- `SparkPoolNodeSize` = "Small"
   - This is the smallest and cheapest Spark pool configuration
   - 4 vCores / 32 GB memory
   - Thisconfiguration should be sufficient in most cases
-- AutoScaleMinNodeCount = 4
+- `AutoScaleMinNodeCount` = 4
   - By default, we have enabled Spark pool auto scale so that we only scale up as needed.
   - This is the lower bound of the nodes count. 
-- AutoScaleMaxNodeCount = 10
+- `AutoScaleMaxNodeCount` = 10
   - This is the upper bound of the nodes count, provides the buffer to allow autoscale to expand capacity only when needed to avoid pipeline failure.
-- AutoPauseDelayInMinute = 5
+- `AutoPauseDelayInMinute` = 5
   - Autopausing for the Spark pool is enabled by default to ensure that we are spending compute resource only when an active pipeline is running
-- NotebookNodeCount = 1
+- `NotebookNodeCount` = 1
   - This is the number of nodes assigned to a notebook (which is part of the pipeline run)
 
 In the configuration described above, we can only safely run 5 (AutoScaleMaxNodeCount/2) scenarios since each pipeline / scenario needs 1
@@ -98,12 +98,15 @@ N.B: Currently, there is no way to do so programmatically through PowerShell com
 
 <br>
 
-## #TODO Stopping & creating new inference pipeline runs
+# Troubleshooting pipeline runs
+## Starting, stopping & creating new inference pipeline runs
 
-####################TODO###################
+While by default (as set up by the pipeline artifacts) the trigger for the inference pipeline is scheduled to run every 10 minutes indefinitely, users may want to stop or edit existing inference triggers. To do so: 1. Click on Manage tab --> 2. Click on Trigger tab --> 3. Select the wanted trigger from the list  (recall scenario name is the first part of the trigger name) --> 4. Select ‘Stopped’ as Status, or make other wanted edits as needed --> 5. Click on Ok --> 6. Click ‘Publish all’ to register the change made.  
+![synapse trigger screenshot](../media/Synapse-trigger.png)
+   
 <br>
 
-## Error surfacing from training and pipeline runs
+## Error surfacing from pipeline runs
 The training and inference pipelines check the outputs (exitValue) from their respective notebook run and. Depending on the value, the pipeline is channeled to "succeed" or "failure" set of activities, with error messages if any, surface in the “Error column” of the monitoring tab, and the “Activity run” section for specific pipeline runs. 
 
 Check name | If notebook output contains | Consequence or error msg 
@@ -111,5 +114,28 @@ Check name | If notebook output contains | Consequence or error msg
 “Check Training Notebook Failure” <br> Solution: check inference notebook for cell with error| At returned value start: `Failure` | If true, error msg output to UI. If false, following activities happen: <br> • 		MVAD model id set as variable <br> • Inference trigger created with parameters passed from training <br> • Trigger started <br> • Metadata Table created in ADX <br> • Parameters passed from training written in Metadata table
 "Check HaltInference Triggers" <br> Solution: check inference notebook for cell with error| At returned value end: `[HaltSubsequent InferenceRuns]` | If true: <br> • Inference trigger stopped (web activity) <br> • Error msg output to UI: `No valid MVAD model found for inference, stopping future triggers for this scenario inference run`
 "Check Inference Notebook Failure" <br> Solution: check inference notebook for cell with error| At returned value start: `Failure` | If true, error msg: as per notebook, and (if any) raw error, including the following: <br> • `Model does not exist [HaltSubsequentInferenceRuns]` <br> • `Model_status ==Failed` <br> • `Unable to query data from ADX. Full error log: " + str(e)` <br> •`No Data Queried from ADX` <br> • `No training data preprocessing configurations` <br> • `Data processing failure. Full error log: " + str(e)` <br> • `No Data After Data Processing` <br> • `Unable to create DetectMultivariateAnomaly object. Full error log: " + str(e)` <br> • `Inference Failure. Full error log: " + str(e)` <br> • `Unable to Write Inference Result to ADX. Full error log: " + str(e)`
+
+<br> 
+
+## Delays with concurrently running pipelines
+If the Synapse pool configuration has not been set up properly to withstand the maximum number of concurrent runs, the following could be observed through the Monitor UI:
+-	delays in scheduled auto-triggered pipeline runs: Pipeline runs have started as seen by the time in “Run start” column but “Status” column stays as “In progress”
+-	Livy error failure appears in Error column: 
+    ```
+    Operation on target Inference failed: Exception: Failed to create Livy session for executing notebook. LivySessionId: 1255, Notebook: consolidated_inference. --> : Livy session has failed. Session state: Killed. Session has been cancelled. Source: User.
+    ```
+
+See the ["Resource limitation checks" section](#resource-limitation-checks) how to adjust the Spark pool and notebook settings to withstand your target number of concurrent pipeline runs.
+
+<br>
+
+## ADX throtting error
+ADX throttling error (see below) occurs when the ADX cluster (where the historized data input and scenario inference result output are stored in different tables) does not have high enough read and write capacity to handle a large number of concurrent scenario runs, which has as output the inference results into an ADX table. See ["Resource limitation checks" section](#resource-limitation-checks) for how to remediate.
+  ```
+  py4j.protocol.Py4JJavaError: An error occurred while calling o636.count.
+  : com.microsoft.kusto.spark.exceptions.FailedOperationException: Failed to execute Kusto operation with OperationId 'f61fe150-08e9-4608-95fb-f96965625d34', State: 'Throttled', Status: 'The control command was aborted due to throttling. Retrying after some backoff might succeed. CommandType: 'DataExportToFile', Capacity: 1, Origin: 'CapacityPolicy/Export'.'
+  at com.microsoft.kusto.spark.utils.KustoDataSourceUtils$.verifyAsyncCommandCompletion(KustoDataSourceUtils.scala:494)
+  at com.microsoft.kusto.spark.datasource.KustoReader.exportPartitionToBlob(KustoReader.scala:244)
+  ``` 
 
 
