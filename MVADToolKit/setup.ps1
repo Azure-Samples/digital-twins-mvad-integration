@@ -207,7 +207,7 @@ Write-Information -MessageData "Synapse resources created" -InformationAction Co
 # Grant Permissions to the Synapse Workspace
 Write-Information -MessageData "Granting Access to your Synapse workspace..." -InformationAction Continue
 Set-AzKeyVaultAccessPolicy -VaultName $KeyVaultName -ObjectId $PrincipalId -PermissionsToSecrets get
-New-AzKustoDatabasePrincipalAssignment -ResourceGroupName $ADXResourceGroup -ClusterName $ADXClusterName -DatabaseName $ADXDatabaseName -SubscriptionId $ADXSubscriptionId -PrincipalAssignmentName $SynapseWorkspaceName -PrincipalId $PrincipalId -TenantId $TenantId -PrincipalType App -Role User
+New-AzKustoDatabasePrincipalAssignment -ResourceGroupName $ADXResourceGroup -ClusterName $ADXClusterName -DatabaseName $ADXDatabaseName -SubscriptionId $ADXSubscriptionId -PrincipalAssignmentName $SynapseWorkspaceName -PrincipalId $PrincipalId -TenantId $TenantId -PrincipalType App -Role admins
 $Params = @{
   ObjectId = $PrincipalId
   RoleDefinitionName = 'Azure Digital Twins Data Reader'
