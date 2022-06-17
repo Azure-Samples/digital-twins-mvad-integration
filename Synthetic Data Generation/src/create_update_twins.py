@@ -67,7 +67,7 @@ def main(args):
     ###### Example query using relationships ######
     query_expression = f"""
     SELECT * FROM digitaltwins t
-    where IS_OF_MODEL('dtmi:syntheticfactory:sourcemachine2;1')
+    where IS_OF_MODEL('dtmi:syntheticfactory:sourcemachine;1')
     """
     query_result = ADTInstance1.query_twins(query_expression)
     print(query_result)
