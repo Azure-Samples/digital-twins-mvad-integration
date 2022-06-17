@@ -1,5 +1,5 @@
 {
-    "@id": "dtmi:syntheticfactory:sourcemachine2;1",
+    "@id": "dtmi:syntheticfactory:sourcemachine;1",
     "@type": "Interface",
     "displayName": "sourcemachine",
     "contents": [
@@ -12,24 +12,17 @@
         },
         {
             "@type": "Property",
-            "name": "Amps_Ia",
-            "displayName": "elec_current_phaseA",
+            "name": "water_flow",
+            "displayName": "water_flow",
             "schema": "double",
-            "comment": "1st phase of electrical current flow in machine im Ampere"
+            "comment": "Water flow rate in machine"
         },
         {
             "@type": "Property",
-            "name": "Amps_Ib",
-            "displayName": "elec_current_phaseB",
+            "name": "oil_flow",
+            "displayName": "oil_flow",
             "schema": "double",
-            "comment": "2nd phase of electrical current flow in machine im Ampere"
-        },
-        {
-            "@type": "Property",
-            "name": "Amps_Ic",
-            "displayName": "elec_current_phaseC",
-            "schema": "double",
-            "comment": "3rd phase of electrical current flow in machine im Ampere"
+            "comment": "Oil flow rate in machine"
         },
         {
             "@type": "Property",
@@ -51,6 +44,6 @@
         }
       ],
     "@context": "dtmi:dtdl:context;2",
-    "comment": "Assume Amps property will get updated from IoT sensor data stream",
-    "description": "a big source node, i.e. big machine, which receives the supply in our synthetic factory, where machines are linked in the same electric circuit"
+    "comment": "Sample model for factory machine that has water and oil flow",
+    "description": "A big source node, i.e. big machine, which receives the supply in our synthetic factory, and connected to machine(s) downstream"
   }

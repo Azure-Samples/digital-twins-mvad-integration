@@ -36,7 +36,7 @@ This project provides the following features:
 ## How to use this sample
 
 ### Prerequisites
-
+* Azure subscription and resource group to [create the required Azure resources](https://docs.microsoft.com/en-us/azure/developer/intro/azure-developer-create-resources)
 * To analyze your assets with MVAD, ensure you have an Azure Digital Twins instance that encompasses the target system, ie. cluster of assets ([see the ADT docs for how-to](https://docs.microsoft.com/en-us/azure/digital-twins/overview)) . If you do not have one, set up a sample one according to the [`Synthetic Data Generation` folder](./Synthetic%20Data%20Generation/README.md/#Intro).
 * Ensure you have Owner and Azure Digital Twins Data Reader role in your Azure Digital Twins instance through Azure Portal
 * Ensure you have Owner role in the associated ADX through Azure Portal
@@ -56,12 +56,14 @@ This project provides the following features:
 
 <br>
 
-### #TODO Quickstart
-To use the toolkit, we perform the following steps through the Synapse UI:
-- Scenario definition
-- training pipeline run
-- inferencing pipeline run
-- Accessing & visualizing results (optional)
+### Quickstart
+The setup script provisions all necessary resources, including the Synapse workspace that we leverage for the toolkit. We perform the following steps through the Synapse UI:
+1. Scenario definition: Define one scenario by filling in the required user-defined parameters in the parameter pop-up window
+2. Training pipeline run: Trigger the training pipeline run for the defined scenario
+3. Inference pipeline run: Trigger the inference pipeline run, using the generated inference trigger which shows up once training successfully completes. 
+4. Repeat steps 1-3 as needed for your different scenarios
+5. Monitor pipeline runs: Use the monitoring UI to ensure the runs complete without errors
+6. Access & visualize results: Access the anomaly detection results in associated scenario's ADX table, and use the provided visualization notebook to get plots of the time-series and anomalies. 
 
 ![synapse workflow](./media/Synapse-workflow.png)
 

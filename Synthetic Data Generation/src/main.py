@@ -270,8 +270,8 @@ def main(
     if not update_stream.empty:
         initial_df = update_stream.loc[update_stream.groupby(['Id', 'Key'])['Timestamp'].idxmin()].reset_index(drop=True)
         initial_df['ModelId'] = np.nan
-        initial_df.loc[initial_df['Id'].isin(['A', 'B']), 'ModelId'] = 'dtmi:syntheticfactory:sourcemachine2;1'
-        initial_df.loc[~initial_df['Id'].isin(['A', 'B']), 'ModelId'] = 'dtmi:syntheticfactory:feedmachine2;1'
+        initial_df.loc[initial_df['Id'].isin(['A', 'B']), 'ModelId'] = 'dtmi:syntheticfactory:sourcemachine;1'
+        initial_df.loc[~initial_df['Id'].isin(['A', 'B']), 'ModelId'] = 'dtmi:syntheticfactory:feedmachine;1'
         initial_df = initial_df[['Id', 'ModelId', 'Key', 'Timestamp', 'Value']]\
                                 .sort_values(['Timestamp', 'Id', 'Key']).reset_index(drop=True)
         if save:
