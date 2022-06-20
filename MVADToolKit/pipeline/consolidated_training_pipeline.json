@@ -109,7 +109,7 @@
                                 "value": "@pipeline().parameters.resampling_rate",
                                 "type": "Expression"
                             },
-                            "type": "int"
+                            "type": "string"
                         },
                         "smoothing": {
                             "value": {
@@ -337,8 +337,8 @@
                 "type": "string"
             },
             "resampling_rate": {
-                "type": "int",
-                "defaultValue": 1
+                "type": "string",
+                "defaultValue": "1min"
             },
             "sliding_window": {
                 "type": "int"
