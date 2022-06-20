@@ -36,10 +36,10 @@ This project provides the following features:
 ## How to use this sample
 
 ### Prerequisites
-* Azure subscription and resource group to [create the required Azure resources](https://docs.microsoft.com/en-us/azure/developer/intro/azure-developer-create-resources)
+* Azure subscription to [create the resource group and the required Azure resources within](https://docs.microsoft.com/en-us/azure/developer/intro/azure-developer-create-resources) for this toolkit
 * To analyze your assets with MVAD, ensure you have an Azure Digital Twins instance that encompasses the target system, ie. cluster of assets ([see the ADT docs for how-to](https://docs.microsoft.com/en-us/azure/digital-twins/overview)) . If you do not have one, set up a sample one according to the [`Synthetic Data Generation` folder](./Synthetic%20Data%20Generation/README.md/#Intro).
 * Ensure you have Owner and Azure Digital Twins Data Reader role in your Azure Digital Twins instance through Azure Portal
-* Ensure you have Owner role in the associated ADX through Azure Portal
+* Ensure you have Owner role in the associated ADX through Azure Portal to be able to read the historized time-series data, and write the toolkit's metadata table and results table
 * To run the setup script, install the following modules in Powershell, if you don't already have it installed:
   * Azure Powershell: [Documentation](https://docs.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-7.3.2)
   * Azure Synapse Powershell module: [Documentation](https://docs.microsoft.com/en-us/azure/synapse-analytics/quickstart-create-workspace-powershell#install-the-azure-synapse-powershell-module)
