@@ -11,7 +11,6 @@ import yaml
 from IPython.core.display import display, HTML
 display(HTML("<style>.container { width:80% !important; }</style>"))
 sys.path.append(str(Path(os.getcwd()).parent) + '\src')
-from create_topology_table import get_topo_df
 from graph_dataset import GraphDataset
 from simulation_anomalylabels import simulate_anomaly_labels
 from simulation_continuous import get_cont_ts_df
@@ -75,7 +74,7 @@ def main(
     # ## Chapter 1. Graph Object Creation
     # #### Step 1.1. Ingest Topology Table
     # Create a sample topology table
-    topo_df = get_topo_df()
+    topo_df = pd.DataFrame(init_graph_kwargs['topo_json_lst'])
     if save:
         topo_df.to_csv(data_path + f'topology_{experiment_name}.csv', index=False)
 
@@ -85,8 +84,8 @@ def main(
                       relationship_to_flow=init_graph_kwargs['relationship_to_flow'], \
                       simulated_nodes=init_graph_kwargs['simulated_nodes'])
     # Plot topology graph
-    if plot:
-        gd.plot_graph()           
+    # if plot:
+    #     gd.plot_graph()           
 
 
     # ## Chapter 2. Anomaly Labels Simulation
@@ -270,8 +269,8 @@ def main(
     if not update_stream.empty:
         initial_df = update_stream.loc[update_stream.groupby(['Id', 'Key'])['Timestamp'].idxmin()].reset_index(drop=True)
         initial_df['ModelId'] = np.nan
-        initial_df.loc[initial_df['Id'].isin(['A', 'B']), 'ModelId'] = 'dtmi:syntheticfactory:sourcemachine;1'
-        initial_df.loc[~initial_df['Id'].isin(['A', 'B']), 'ModelId'] = 'dtmi:syntheticfactory:feedmachine;1'
+        initial_df.loc[initial_df['Id'].isin(['A', 'B']), 'ModelId'] = 'dtmi:syntheticfactory:sourcemachine2;1'
+        initial_df.loc[~initial_df['Id'].isin(['A', 'B']), 'ModelId'] = 'dtmi:syntheticfactory:feedmachine2;1'
         initial_df = initial_df[['Id', 'ModelId', 'Key', 'Timestamp', 'Value']]\
                                 .sort_values(['Timestamp', 'Id', 'Key']).reset_index(drop=True)
         if save:
