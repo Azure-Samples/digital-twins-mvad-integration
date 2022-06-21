@@ -71,9 +71,6 @@ See the [toolkit's user-guide](./MVADToolkit/README.md/#user-guide), for the det
 
 <br>
 
-## #TODO Toolkit Demo
-#TODO: Add demo video
-
 
 ## Resources
 
