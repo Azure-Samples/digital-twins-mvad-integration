@@ -222,9 +222,10 @@ Alternatively, you can use the provided optional visualization notebook:
 - In the Synapse workspace, go to the "Develop" tab, select the "MVAD_Visualization notebook
 - Run the provided Python code up to the Section 2, where you can uncomment to input the appropriate parameters
 - Run the cell containing the `get_mvad_result_from_adx` to get the following plots:
-  - A plot of the selected time-series and the anomaly results. E.g.
+  - A plot of the selected time-series and the anomaly results. E.g.:
     ![plot_tsanom](../media/plot_tsanom.png)
-  - A plot of the severity of the detected anomalies. E.g.
+  - A plot of the severity of the detected anomalies. E.g.:
+  
     ![plot_severity](../media/plot_severity.png)
   - A plot of the contribution scores of the selected time-series for the detected anomalies. E.g.:
   - ![plot_contrib](../media/plot_contribscores.png)
