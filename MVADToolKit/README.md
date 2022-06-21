@@ -94,6 +94,12 @@ The following data-flow diagram illustrates how the toolkit's provided pipeline 
 
   ![Training-inf-dataflow](../media/Train-Inf-Data-flow.png)
 
+Note:
+- Before running multiple pipelines concurrently, make sure your resources have adequate capacity. In the troubleshooting guide, refer to the following sections:
+  - [Concurrent read and write capacity of the ADX cluster](./troubleshooting.md#concurrent-read-and-write-capacity-of-adx-cluster)
+  - [Synapse Spark pool nodes](./troubleshooting.md#spark-pool-nodes)
+  - [Synapse notebook idle time](./troubleshooting.md#synapse-notebook-idle-time)
+
 <br> 
 
 ## Scenario definition & training pipeline run
@@ -103,9 +109,21 @@ In the Synapse Workspace UI,
     
     ![scenario-def-training](../media/scenario-def-training.png)
 
-- A pop up will appear, with a list of necessary scenario parameters to fill in:
-  - #TODO add details
-
+A pop up will appear, with a list of necessary scenario parameters to fill in. The parameters are as follows:
+- `scenario_name`: identifier for the MVAD analysis you want to do, it can be representative of the context i.e. twin cluster and properties, and the specific parameters used.
+- To provide context:
+  - `customer_adt_query`: ADT query to identify ADT twins (within the linked ADT instance) to be monitored,  query must result in a list of dtid entries. The ADT query must be in the form ready to be executed, as in the [ADX plugin](https://docs.microsoft.com/en-us/azure/digital-twins/concepts-data-explorer-plugin). E.g.: `SELECT t.$dtId as tid FROM DIGITALTWINS t`
+  - `relevant_twin_properties`: List of twin properties of interest.E.g. ["water_flow", "oil_flow"]
+- To add the time-series information info: 
+  - `adx_table`: By default, this is prefilled with the ADX table linked during the setup phase, and should contain the historized time-series data.
+  - (optional) `adx_mapping_id`, `adx_mapping_key`, `adx_mapping_value`, `adx_mapping_sourcetime`. By default, this contains the prefilled values `Id`, `Key`, `Value`, `SourceTimestamp` respectively, as this the schema for an ADX table set up through [ADT's Data History connection](https://docs.microsoft.com/en-us/azure/digital-twins/how-to-use-data-history?tabs=cli). If you are connecting an ADX table that is set up otherwise, please add the mapping to its schema, where `adx_mapping_id` refers to the column name of the column for the ADT twin ids, `adx_mapping_key`: column name for the ADT twin properties' names, `ad_mapping_value`: column name for the ADT twin properties' values, `adt_mapping_sourcetime`: column name for the timestamps of the ADT twin properties' value updates. This assumes that the ADX table is already in long format. 
+- MVAD prep parameters:
+  - `resampling_rate_min`: unit, in minutes, for realignment of the various properties/variable's timestamps during preprocessing. E.g. 1
+  - `train_data_smoothing`: boolean (true/false) to denote whether to smooth the training data during preprocessing. This is recommended to remove outliers or univariate anomalies to capture normal behavior in the training data, [as recommended by MVAD](https://docs.microsoft.com/en-us/azure/cognitive-services/anomaly-detector/concepts/best-practices-multivariate). 
+- MVAD parameters:
+  - `sliding_window`: number of data-points used by the MVAD algorithm to determine an anomaly, ideally an adequate sliding window captures periodicity in the data. E.g. 1440 representing a sliding window of 1 day for data of 1-minute granularity
+  - `train_start_datetime`, `train_end_datetime`: start and end datetime for training data. Ensure the datetime entered is in ISO8601 format, by default time taken as UTC time. E.g. 2022-06-01T00:00:00Z, 2022-06-14T00:00:00Z
+  
     ![scenario-params](../media/scenario-params.png)
 
 - Click on 'OK' to trigger the training pipeline.
@@ -114,16 +132,13 @@ Once the training pipeline is triggered, the pipeline run can be **monitored** u
 
    ![training-pipeline-run](../media/training-pipeline-run.png)
 
-Note:
+Note: 
 - The activities in the training pipeline runs are planned according to the configurations provided in the toolkit's pipeline json file.
 - As part of the activities, the training notebook takes in the user-defined input parameters.
 - The notebook can be opened using the button highlighted above, and can be used for **debugging** in case of pipeline failure.
-
+ 
 <br> 
 
-### #TODO [Optional] smoothing training data
-
-<br> 
 
 ## Inference pipeline run
 
@@ -176,8 +191,43 @@ In the Monitor UI for pipeline runs, users can check their progress using the St
 - Drill down further where the error occurred in the notebook: Click on failed pipeline run to show the list of associated activity runs --> Open notebook snapshot --> Look for notebook cell generating the error.
   ![monitoring-notebook-failed](../media/monitoring-notebook-failed.png)
 
-## #TODO Accessing & visualizing anomaly results (optional)
+<br> 
+
+## Accessing & visualizing anomaly results
+Anomaly detection results can be accessed in the ADX cluster used. Currently, 
+- One result table is created per scenario, and takes the name of the scenario.
+- Besides the anomaly results, the table consists of the preprocessed time-series of the selected properties of queried twins, with the preprocessing as done the pre-processing function in the notebooks.
+- The anomaly results are in the `isAnomaly` and `result` columns, and are per timestamp of the processed data:
+  - `isAnomaly`: Boolean giving raw anomaly result from MVAD inference.
+  - `result`: list containing more detailed result scores, including (more results in [this MVAD documentation](https://docs.microsoft.com/en-us/azure/cognitive-services/anomaly-detector/tutorials/learn-multivariate-anomaly-detection)): 
+    - `severity`: relative severity of the anomaly (from 0-normal- to 1). 
+    - `score`: raw score from MVAD model
+    - `contributors`: dictionary of contribution score per each variable, which can be used to drill into which variable or properties contributed most to the anomaly at that timestamp.
 
 <br> 
 
+### Visualizing anomaly results
+To help visualize the anomaly detection results, you can have a first look through ADX. The following Kusto command can be used (substitute in for the right `scenario_name` and `param_name` for the wanted properties'names, or part of - e.g. `*_flow`):
 
+```
+<scenario_name>
+| extend timestamp=todatetime(timestamp)
+| project-keep timestamp, isAnomaly, *_<param_name>
+| order by timestamp asc
+| render timechart
+```
+
+Alternatively, you can use the provided optional visualization notebook:
+![viz-notebook](../media/viz-notebook.png)
+- In the Synapse workspace, go to the "Develop" tab, select the "MVAD_Visualization notebook
+- Run the provided Python code up to the Section 2, where you can uncomment to input the appropriate parameters
+- Run the cell containing the `get_mvad_result_from_adx` to get the following plots:
+  - A plot of the selected time-series and the anomaly results. E.g.:
+    ![plot_tsanom](../media/plot_tsanom.png)
+  - A plot of the severity of the detected anomalies. E.g.:
+  
+    ![plot_severity](../media/plot_severity.png)
+  - A plot of the contribution scores of the selected time-series for the detected anomalies. E.g.:
+  - ![plot_contrib](../media/plot_contribscores.png)
+
+In the example plots above, note that different detected anomalies can have different severity levels. Users are encouraged to additionally filter out anomalies that are not severe enough, using the `severity` result, to avoid too many false positives. See the [MVAD documentation](https://docs.microsoft.com/en-us/azure/cognitive-services/anomaly-detector/concepts/best-practices-multivariate) to learn more about severity and contribution scores.    
