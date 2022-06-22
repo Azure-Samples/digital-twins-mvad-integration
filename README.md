@@ -1,14 +1,30 @@
+---
+page_type: sample
+languages:
+- PowerShell
+- Python
+- json
+products:
+- azure-digital-twins
+- azure-anomaly-detector
+- azure-synapse-analytics
+- azure-data-explorer
+name: Azure Digital Twins Multivariate Anomaly Detection Toolkit
+description: A code sample for integrating Azure Digital Twins to a multivariate anomaly detection solution (Anomaly Detector)
+urlFragment: adt-mvad-integration
+---
+
 # Azure Digital Twins Multivariate Anomaly Detection Toolkit
 
 Azure Digital Twins Multivariate Anomaly Detection Toolkit is a sample project to showcase a low-code integration of [Azure Digital Twins](https://docs.microsoft.com/en-us/azure/digital-twins/overview) with [Azure AI and Cognitive Services' Anomaly Detector](https://azure.microsoft.com/en-us/services/cognitive-services/anomaly-detector/), an advanced AI solution to help identify abnormal operations or defective assets in near real-time.
 
-This integration toolkit leverages [Azure Data Explorer (ADX)](https://docs.microsoft.com/en-us/azure/data-explorer/data-explorer-overview) for data egress, and Synapse Analytics as the UI platform to host and run the toolkit code. ADT users can thus easily onboard and quickly connect to a downstream AI/ML solution. The goal of this toolkit is to allow ADT users to easily leverage the power of the twin graph, with historized time-series data, to identify anomalies in modelled environments. This is done by:
+This integration toolkit leverages [Azure Data Explorer (ADX)](https://docs.microsoft.com/en-us/azure/data-explorer/data-explorer-overview) for data egress, and [Synapse Analytics](https://docs.microsoft.com/en-us/azure/synapse-analytics/overview-what-is) as the UI platform to host and run the toolkit code. ADT users can thus easily onboard and quickly connect to a downstream AI/ML solution. The goal of this toolkit is to allow ADT users to easily leverage the power of the twin graph, with historized time-series data, to identify anomalies in modelled environments. This is done by:
 - Defining one or more scenarios:
   - [Querying the twin graph](https://docs.microsoft.com/en-us/azure/digital-twins/how-to-query-graph) to provide a scenario's wanted **context** by leveraging ADT's ADX plugin,
   - Selecting the target properties in the scenario, i.e. the multiple variables, to later **analyze all together in a multivariate** fashion,
-  - Ensuring data from the selected twin graph **time-series** variables' data is **historized** to an ADX cluster: directly through [ADT's Data History feature](https://docs.microsoft.com/en-us/azure/digital-twins/how-to-use-data-history?tabs=cli) or indirectly by linkineg an associated ADX table,
-- For each scenario, running the **training** pipeline so that the AI model learns the scenario's system's **normal behavior** from the historized data. 
-- Running the **inference** pipeline so that the scenario's associated trained AI model can detect **anomalous behavior** in near real-time.
+  - Ensuring data from the selected twin graph **time-series** variables' data is **historized** to an ADX cluster: directly through [ADT's Data History feature](https://docs.microsoft.com/en-us/azure/digital-twins/how-to-use-data-history?tabs=cli) or indirectly by linking an associated ADX table,
+- For each scenario, running the **training** pipeline so that data is preprocessed and MVAD's AI model learns the scenario's system's **normal behavior** from the historized data. 
+- Running the **inference** pipeline so that data is preprocessed and the scenario's associated trained AI model can detect **anomalous behavior** in near real-time.
 - Accessing and visualizing the anomaly detection results in an ADX table.
 
 <br>
