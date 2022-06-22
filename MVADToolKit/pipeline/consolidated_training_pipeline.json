@@ -99,7 +99,7 @@
                         },
                         "sliding_window": {
                             "value": {
-                                "value": "@pipeline().parameters.sliding_window",
+                                "value": "@pipeline().parameters.sliding_window_num_datapoints",
                                 "type": "Expression"
                             },
                             "type": "int"
@@ -220,7 +220,7 @@
                                     "Content-Type": "application/json"
                                 },
                                 "body": {
-                                    "value": "{\n    \"properties\": {\n        \"pipelines\": [\n            {\n                \"pipelineReference\": {\n                    \"referenceName\": \"consolidated_inference_pipeline\",\n                    \"type\": \"PipelineReference\"\n                },\n                \"parameters\": {\n                    \"adls_account\": \"@{variables('adls_account')}\",\n                    \"adls_container\": \"@{variables('adls_container')}\",\n                    \"kusto_database\": \"@{variables('kusto_database')}\",\n                    \"scenario_name\": \"@{pipeline().parameters.scenario_name}\",\n                    \"kv_name\": \"@{variables('kv_name')}\",\n                    \"mvad_model_id\": \"@{variables('model_id')}\",\n                    \"adt_endpoint\": \"@{variables('adt_endpoint')}\",\n                    \"adx_table\": \"@{pipeline().parameters.adx_table}\",\n                    \"customer_adt_query\": \"@{pipeline().parameters.customer_adt_query}\",\n                    \"relevant_metrics\": @{pipeline().parameters.relevant_twin_properties},\n                    \"mvad_region\": \"@{variables('mvad_region')}\",\n                    \"training_args\": \"@{variables('training_args')}\",\n                    \"resampling_rate\": @{pipeline().parameters.resampling_rate_min},\n                    \"sliding_window\": @{pipeline().parameters.sliding_window}\n                }\n            }\n        ],\n        \"type\": \"ScheduleTrigger\",\n        \"typeProperties\": {\n           \"recurrence\": {\n             \"frequency\": \"Minute\",\n             \"interval\": 10,\n             \"startTime\": \"@{utcnow()}\",\n             \"endTime\": \"@{getFutureTime(3, 'Day')}\",\n             \"timeZone\": \"UTC\"\n            }\n        }\n    }\n}",
+                                    "value": "{\n    \"properties\": {\n        \"pipelines\": [\n            {\n                \"pipelineReference\": {\n                    \"referenceName\": \"consolidated_inference_pipeline\",\n                    \"type\": \"PipelineReference\"\n                },\n                \"parameters\": {\n                    \"adls_account\": \"@{variables('adls_account')}\",\n                    \"adls_container\": \"@{variables('adls_container')}\",\n                    \"kusto_database\": \"@{variables('kusto_database')}\",\n                    \"scenario_name\": \"@{pipeline().parameters.scenario_name}\",\n                    \"kv_name\": \"@{variables('kv_name')}\",\n                    \"mvad_model_id\": \"@{variables('model_id')}\",\n                    \"adt_endpoint\": \"@{variables('adt_endpoint')}\",\n                    \"adx_table\": \"@{pipeline().parameters.adx_table}\",\n                    \"customer_adt_query\": \"@{pipeline().parameters.customer_adt_query}\",\n                    \"relevant_metrics\": @{pipeline().parameters.relevant_twin_properties},\n                    \"mvad_region\": \"@{variables('mvad_region')}\",\n                    \"training_args\": \"@{variables('training_args')}\",\n                    \"resampling_rate\": @{pipeline().parameters.resampling_rate_min},\n                    \"sliding_window\": @{pipeline().parameters.sliding_window_num_datapoints}\n                }\n            }\n        ],\n        \"type\": \"ScheduleTrigger\",\n        \"typeProperties\": {\n           \"recurrence\": {\n             \"frequency\": \"Minute\",\n             \"interval\": 10,\n             \"startTime\": \"@{utcnow()}\",\n             \"endTime\": \"@{getFutureTime(3, 'Day')}\",\n             \"timeZone\": \"UTC\"\n            }\n        }\n    }\n}",
                                     "type": "Expression"
                                 },
                                 "authentication": {
@@ -278,7 +278,7 @@
                             "userProperties": [],
                             "typeProperties": {
                                 "command": {
-                                    "value": "@concat('.ingest inline into table metadataTable <|',' \"',pipeline().parameters.scenario_name,'\",\"',pipeline().parameters.customer_adt_query,'\",\"',variables('model_id'),'\",\"[\"\"',join(pipeline().parameters.relevant_twin_properties, '\"\",\"\"'),'\"\"]\",\"',string(pipeline().parameters.train_start_datetime),'\",\"',string(pipeline().parameters.train_end_datetime),'\",\"',string(pipeline().parameters.sliding_window),'\",\"',last(take(split(activity('Training').output.status.Output.result.exitValue, ';'), 2)),'\"')",
+                                    "value": "@concat('.ingest inline into table metadataTable <|',' \"',pipeline().parameters.scenario_name,'\",\"',pipeline().parameters.customer_adt_query,'\",\"',variables('model_id'),'\",\"[\"\"',join(pipeline().parameters.relevant_twin_properties, '\"\",\"\"'),'\"\"]\",\"',string(pipeline().parameters.train_start_datetime),'\",\"',string(pipeline().parameters.train_end_datetime),'\",\"',string(pipeline().parameters.sliding_window_num_datapoints),'\",\"',last(take(split(activity('Training').output.status.Output.result.exitValue, ';'), 2)),'\"')",
                                     "type": "Expression"
                                 },
                                 "commandTimeout": "00:20:00"
@@ -340,7 +340,7 @@
                 "type": "int",
                 "defaultValue": 1
             },
-            "sliding_window": {
+            "sliding_window_num_datapoints": {
                 "type": "int"
             },
             "train_data_smoothing": {
