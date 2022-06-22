@@ -70,9 +70,9 @@ To run `setup.ps1`, provide these parameters:
 
 ## Run setup script
 
-A sample command will look like this:
+Run the setup script with your resource parameters:
 
-`.\MVADToolkit\setup.ps1 -SubscriptionId <subscriptionId> -ResourceGroup <rg> -Location <location> -ADXResourceGroup <adx_rg> -ADXEndpoint <adx_endpoint> -ADXClusterName <cluster> -ADXDatabaseName <database> -ADXTable <table> -ADTResourceGroup <adt_rg> -ADTEndpoint <adt_endpoint> -SqlUser <user> -SqlPassword <password> `
+`.\setup.ps1 -SubscriptionId <subscriptionId> -ResourceGroup <rg> -Location <location> -ADXResourceGroup <adx_rg> -ADXEndpoint <adx_endpoint> -ADXClusterName <cluster> -ADXDatabaseName <database> -ADXTable <table> -ADTResourceGroup <adt_rg> -ADTEndpoint <adt_endpoint> -SqlUser <user> -SqlPassword <password> `
 
 - This will run for 5-10 mins.
 - If there are permission errors, use the following command:` Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`
