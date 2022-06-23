@@ -1,0 +1,71 @@
+{
+    "topology": [
+        {
+            "relationshipName": "isParent",
+            "sourceId": "B",
+            "targetId": "E"
+        },
+        {
+            "relationshipName": "isParent",
+            "sourceId": "B",
+            "targetId": "F"
+        },
+        {
+            "relationshipName": "isParent",
+            "sourceId": "B",
+            "targetId": "G"
+        },
+        {
+            "relationshipName": "isParent",
+            "sourceId": "B",
+            "targetId": "I"
+        },
+        {
+            "relationshipName": "isParent",
+            "sourceId": "D",
+            "targetId": "H"
+        },
+        {
+            "relationshipName": "isParent",
+            "sourceId": "H",
+            "targetId": "J"
+        },
+        {
+            "relationshipName": "isParent",
+            "sourceId": "A",
+            "targetId": "C"
+        },
+        {
+            "relationshipName": "isParent",
+            "sourceId": "A",
+            "targetId": "D"
+        },
+        {
+            "relationshipName": "isParent",
+            "sourceId": "A",
+            "targetId": "E"
+        },
+        {
+            "relationshipName": "isRedundant",
+            "sourceId": "I",
+            "targetId": "F"
+        },
+        {
+            "relationshipName": "isRedundant",
+            "sourceId": "F",
+            "targetId": "I"
+        }
+      ]
+  }
+
+
+
+
+
+
+
+
+
+
+
+
