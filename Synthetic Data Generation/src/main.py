@@ -74,7 +74,9 @@ def main(
     # ## Chapter 1. Graph Object Creation
     # #### Step 1.1. Ingest Topology Table
     # Create a sample topology table
-    topo_df = pd.DataFrame(init_graph_kwargs['topo_json_lst'])
+    with open(init_graph_kwargs['topo_json_file'], 'r') as f:
+        topo_json = yaml.safe_load(f)
+    topo_df = pd.DataFrame(list(topo_json.values())[0])
     if save:
         topo_df.to_csv(data_path + f'topology_{experiment_name}.csv', index=False)
 
@@ -86,6 +88,14 @@ def main(
     # Plot topology graph
     # if plot:
     #     gd.plot_graph()           
+
+    # #### Step 1.3. Read in DTDL Models
+    model_json_dic = {}
+    for i in os.listdir(init_graph_kwargs['models_json_folder']):
+        with open(os.path.join(init_graph_kwargs['models_json_folder'], i), 'r') as f:
+            model_json = yaml.safe_load(f)
+        model_name = model_json['displayName']
+        model_json_dic[model_name] = model_json
 
 
     # ## Chapter 2. Anomaly Labels Simulation
@@ -120,8 +130,8 @@ def main(
                 surge_with_decay=simulate_ts_kwargs_continuous['surge_with_decay_lst'][i])
             update_stream_continuous = pd.concat([update_stream_continuous, tmp_ts_df])
         update_stream_continuous['ModelId'] = np.nan
-        update_stream_continuous.loc[update_stream_continuous['Id'].isin(['A', 'B']), 'ModelId'] = 'dtmi:syntheticfactory:sourcemachine;1'
-        update_stream_continuous.loc[~update_stream_continuous['Id'].isin(['A', 'B']), 'ModelId'] = 'dtmi:syntheticfactory:feedmachine;1'
+        for model_name, twins in init_graph_kwargs['model_twins_dic'].items():
+            update_stream_continuous.loc[update_stream_continuous['Id'].isin(twins), 'ModelId'] = model_json_dic[model_name]['@id']
         update_stream_continuous = update_stream_continuous[['Id', 'ModelId', 'Key', 'Timestamp', 'Value']].sort_values(['Timestamp', 'Id', 'Key']).reset_index(drop=True)
         update_stream = pd.concat([update_stream, update_stream_continuous])
 
@@ -169,8 +179,8 @@ def main(
             timestamp_noise_lst=simulate_ts_kwargs_categorical['timestamp_noise_lst']
             )
         update_stream_categorical['ModelId'] = np.nan
-        update_stream_categorical.loc[update_stream_categorical['Id'].isin(['A', 'B']), 'ModelId'] = 'dtmi:syntheticfactory:sourcemachine;1'
-        update_stream_categorical.loc[~update_stream_categorical['Id'].isin(['A', 'B']), 'ModelId'] = 'dtmi:syntheticfactory:feedmachine;1'
+        for model_name, twins in init_graph_kwargs['model_twins_dic'].items():
+            update_stream_categorical.loc[update_stream_categorical['Id'].isin(twins), 'ModelId'] = model_json_dic[model_name]['@id']
         update_stream_categorical = update_stream_categorical[['Id', 'ModelId', 'Key', 'Timestamp', 'Value']].sort_values(['Timestamp', 'Id', 'Key']).reset_index(drop=True)
         update_stream = pd.concat([update_stream, update_stream_categorical])
         
@@ -208,8 +218,8 @@ def main(
                 )
             update_stream_monotonic = pd.concat([update_stream_monotonic, tmp_monotonic_ts_df])
         update_stream_monotonic['ModelId'] = np.nan
-        update_stream_monotonic.loc[update_stream_monotonic['Id'].isin(['A', 'B']), 'ModelId'] = 'dtmi:syntheticfactory:sourcemachine;1'
-        update_stream_monotonic.loc[~update_stream_monotonic['Id'].isin(['A', 'B']), 'ModelId'] = 'dtmi:syntheticfactory:feedmachine;1'
+        for model_name, twins in init_graph_kwargs['model_twins_dic'].items():
+            update_stream_monotonic.loc[update_stream_monotonic['Id'].isin(twins), 'ModelId'] = model_json_dic[model_name]['@id']
         update_stream_monotonic = update_stream_monotonic[['Id', 'ModelId', 'Key', 'Timestamp', 'Value']].sort_values(['Timestamp', 'Id', 'Key']).reset_index(drop=True)
         update_stream = pd.concat([update_stream, update_stream_monotonic])
 
@@ -238,8 +248,8 @@ def main(
         print('Binary count for each Id:')
         print(update_stream_binary.groupby('Id')['Value'].value_counts())
         update_stream_binary['ModelId'] = np.nan
-        update_stream_binary.loc[update_stream_binary['Id'].isin(['A', 'B']), 'ModelId'] = 'dtmi:syntheticfactory:sourcemachine;1'
-        update_stream_binary.loc[~update_stream_binary['Id'].isin(['A', 'B']), 'ModelId'] = 'dtmi:syntheticfactory:feedmachine;1'
+        for model_name, twins in init_graph_kwargs['model_twins_dic'].items():
+            update_stream_binary.loc[update_stream_binary['Id'].isin(twins), 'ModelId'] = model_json_dic[model_name]['@id']
         update_stream_binary = update_stream_binary[['Id', 'ModelId', 'Key', 'Timestamp', 'Value']].sort_values(['Timestamp', 'Id', 'Key']).reset_index(drop=True)
         update_stream = pd.concat([update_stream, update_stream_binary])
 
@@ -268,9 +278,6 @@ def main(
     # ### Part 3.6. Get Initial Twins
     if not update_stream.empty:
         initial_df = update_stream.loc[update_stream.groupby(['Id', 'Key'])['Timestamp'].idxmin()].reset_index(drop=True)
-        initial_df['ModelId'] = np.nan
-        initial_df.loc[initial_df['Id'].isin(['A', 'B']), 'ModelId'] = 'dtmi:syntheticfactory:sourcemachine2;1'
-        initial_df.loc[~initial_df['Id'].isin(['A', 'B']), 'ModelId'] = 'dtmi:syntheticfactory:feedmachine2;1'
         initial_df = initial_df[['Id', 'ModelId', 'Key', 'Timestamp', 'Value']]\
                                 .sort_values(['Timestamp', 'Id', 'Key']).reset_index(drop=True)
         if save:

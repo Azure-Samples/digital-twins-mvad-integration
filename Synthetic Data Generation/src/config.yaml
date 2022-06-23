@@ -1,6 +1,6 @@
 experiment_name: 'v1_20220601_20220701'
 profiles_included: ['continuous', 'categorical', 'monotonic', 'binary']
-plot: True
+plot: False
 save: True
 timestamp_noise: &timestamp_noise False
 seed: 5
@@ -9,42 +9,13 @@ data_history_format: True
 #############################################################################################
 
 init_graph_kwargs:
-  topo_json_lst: 
-    - relationshipName: "isParent"
-      sourceId: "B"
-      targetId: "E"
-    - relationshipName: "isParent"
-      sourceId: "B"
-      targetId: "F"
-    - relationshipName: "isParent"
-      sourceId: "B"
-      targetId: "G"      
-    - relationshipName: "isParent"
-      sourceId: "B"
-      targetId: "I"
-    - relationshipName: "isParent"
-      sourceId: "D"
-      targetId: "H"
-    - relationshipName: "isParent"
-      sourceId: "H"
-      targetId: "J"
-    - relationshipName: "isParent"
-      sourceId: "A"
-      targetId: "C"
-    - relationshipName: "isParent"
-      sourceId: "A"
-      targetId: "D"      
-    - relationshipName: "isParent"
-      sourceId: "A"
-      targetId: "E"
-    - relationshipName: "isRedundant"
-      sourceId: "I"
-      targetId: "F"
-    - relationshipName: "isRedundant"
-      sourceId: "F"
-      targetId: "I"
+  topo_json_file: '../data/topology_json/topology.json'
   relationship_to_flow: 'isParent'
   simulated_nodes: ['A', 'B']
+  model_twins_dic:
+    "sourcemachine": ['A', 'B']
+    "feedmachine": ['C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+  models_json_folder: '../data/models_json/'
 
 simulate_anomaly_labels_kwargs:
   num_simulated_anomaly_ts: 1
