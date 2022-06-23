@@ -131,8 +131,8 @@ Write-Information -MessageData "Creating ADLS Account..." -InformationAction Con
 New-AzStorageAccount -ResourceGroupName $ResourceGroup -AccountName $ADLSAccountName -Location $Location -SkuName Standard_GRS -Kind StorageV2 -EnableHierarchicalNamespace $true
 New-AzStorageAccountKey -ResourceGroupName $ResourceGroup -Name $ADLSAccountName -KeyName key1
 $ADLSAccountKey = (Get-AzStorageAccountKey -ResourceGroupName $ResourceGroup -AccountName $ADLSAccountName)[0].value
-$ctx = New-AzStorageContext -StorageAccountName $ADLSAccountName -UseConnectedAccount 
-New-AzStorageContainer -Context $ctx -Name $ADLSAccountName
+$ctx = New-AzStorageContext -StorageAccountName $ADLSAccountName -StorageAccountKey $ADLSAccountKey  
+New-AzStorageContainer -Context $ctx -Name $ADLSContainer
 $ADLSConnectionString = 'DefaultEndpointsProtocol=https;AccountName=' + $ADLSAccountName + ';AccountKey=' + $ADLSAccountKey + ';EndpointSuffix=core.windows.net' 
 $ADLSConnectionString = ConvertTo-SecureString $ADLSConnectionString -AsPlainText -Force
 Write-Information -MessageData "ADLS Account Created" -InformationAction Continue
