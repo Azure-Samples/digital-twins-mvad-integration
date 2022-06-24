@@ -8,8 +8,6 @@ import os
 import sys
 from pathlib import Path
 import yaml
-from IPython.core.display import display, HTML
-display(HTML("<style>.container { width:80% !important; }</style>"))
 sys.path.append(str(Path(os.getcwd()).parent) + '\src')
 from graph_dataset import GraphDataset
 from simulation_anomalylabels import simulate_anomaly_labels
@@ -149,7 +147,7 @@ def main(
         if save:
             update_stream_continuous.to_csv(data_path + f'update_stream_continuous_{experiment_name}.csv', index=False)
         print('Sample Update_stream_continuous.csv:')
-        display(update_stream_continuous.head())
+        print(update_stream_continuous.head())
 
 
     # # Add Pattern Anomalies
@@ -188,13 +186,13 @@ def main(
             plot_ts(ts_df=update_stream_categorical,
                     anomaly_label=anomaly_label_lst[0], 
                     mode='markers')
-            display(update_stream_categorical)
+            print(update_stream_categorical)
                 
         # Output Update_stream_categorical.csv
         if save:
             update_stream_categorical.to_csv(data_path + f'update_stream_categorical_{experiment_name}.csv', index=False)
         print('Sample Update_stream_categorical.csv:')
-        display(update_stream_categorical.head())
+        print(update_stream_categorical.head())
 
 
     # ### Part 3.3. Data Profile - Monotonic
@@ -226,7 +224,7 @@ def main(
         if plot:
             plot_ts(ts_df=update_stream_monotonic,
                     anomaly_label=anomaly_label_lst[0])
-            display(update_stream_monotonic)
+            print(update_stream_monotonic)
 
         # Output Update_stream_monotonic.csv, Topology_monotonic.json & Topology_monotonic.csv
         generate_relationship_json(
@@ -239,7 +237,7 @@ def main(
         if save:
             update_stream_monotonic.to_csv(data_path + f'update_stream_monotonic_{experiment_name}.csv', index=False)
         print('\nSample Update_stream_monotonic.csv:')
-        display(update_stream_monotonic.head())
+        print(update_stream_monotonic.head())
 
     # ### Part 3.4. Data Profile - Binary
     # Simulate Binary Time-series
@@ -256,13 +254,13 @@ def main(
         if plot:
             plot_ts(ts_df=update_stream_binary,
                     anomaly_label=anomaly_label_lst[0])
-            display(update_stream_binary)
+            print(update_stream_binary)
 
         # Output: Update_stream_binary.csv
         if save:
             update_stream_binary.to_csv(data_path + f'update_stream_binary_{experiment_name}.csv', index=False)
         print('Sample Update_stream_binary.csv:')
-        display(update_stream_binary.head(10))
+        print(update_stream_binary.head(10))
 
     # ### Part 3.5. Combine Different Data Profile of Same Timerange Together
     if not update_stream.empty:
@@ -273,7 +271,7 @@ def main(
         if save:
             update_stream.to_csv(data_path + f'update_stream_{experiment_name}.csv', index=False)
             print('Sample Update_stream.csv:')
-            display(update_stream.head(10))
+            print(update_stream.head(10))
 
     # ### Part 3.6. Get Initial Twins
     if not update_stream.empty:
@@ -283,14 +281,14 @@ def main(
         if save:
             initial_df.to_csv(data_path + f'initial_twins_{experiment_name}.csv', index=False)
         print('Initial_twins.csv:')
-        display(initial_df)
+        print(initial_df)
 
     # ### Part 4. Format Synthetic Data to get consistent with ADT Data History
     if data_history_format:
         update_stream_dh = data_history_formatter(df=update_stream)
         update_stream_dh.to_csv(data_path + f'update_stream_dh_{experiment_name}.csv', index=False)
         print('Sample Update_stream.csv In ADT Data History Format:')
-        display(update_stream_dh.head(10))
+        print(update_stream_dh.head(10))
 
 
 if __name__ == '__main__':

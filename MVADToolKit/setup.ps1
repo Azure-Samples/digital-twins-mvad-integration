@@ -123,7 +123,7 @@ Write-Information -MessageData "Creating MVAD Resources..." -InformationAction C
 New-AzCognitiveServicesAccount -ResourceGroupName $ResourceGroup -name $MVADResourceName -Type AnomalyDetector -SkuName S0 -Location $Location -ErrorAction Stop
 while (!((Get-AzCognitiveServicesAccount -ResourceGroupName $ResourceGroup -name $MVADResourceName).ProvisioningState -eq "Succeeded"))
 {
-   sleep 5
+    Start-Sleep -Seconds 5
 }
 New-AzCognitiveServicesAccountKey -ResourceGroupName $ResourceGroup -name $MVADResourceName -keyname Key1 | Out-Null
 $MVADKey = (Get-AzCognitiveServicesAccountKey -ResourceGroupName $ResourceGroup -name $MVADResourceName).key1
@@ -135,7 +135,8 @@ Write-Information -MessageData "Creating ADLS Account..." -InformationAction Con
 New-AzStorageAccount -ResourceGroupName $ResourceGroup -AccountName $ADLSAccountName -Location $Location -SkuName Standard_GRS -Kind StorageV2 -EnableHierarchicalNamespace $true
 New-AzStorageAccountKey -ResourceGroupName $ResourceGroup -Name $ADLSAccountName -KeyName key1
 $ADLSAccountKey = (Get-AzStorageAccountKey -ResourceGroupName $ResourceGroup -AccountName $ADLSAccountName)[0].value
-$ctx = New-AzStorageContext -StorageAccountName $ADLSAccountName -StorageAccountKey $ADLSAccountKey  
+$ctx = New-AzStorageContext -StorageAccountName $ADLSAccountName -StorageAccountKey $ADLSAccountKey
+Start-Sleep -Seconds 15
 New-AzStorageContainer -Context $ctx -Name $ADLSContainer
 $ADLSConnectionString = 'DefaultEndpointsProtocol=https;AccountName=' + $ADLSAccountName + ';AccountKey=' + $ADLSAccountKey + ';EndpointSuffix=core.windows.net' 
 $ADLSConnectionString = ConvertTo-SecureString $ADLSConnectionString -AsPlainText -Force
