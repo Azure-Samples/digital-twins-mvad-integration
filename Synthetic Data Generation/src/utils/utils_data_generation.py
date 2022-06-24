@@ -10,7 +10,6 @@ import numpy as np
 from numpy.random import uniform, normal
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from tqdm.notebook import tqdm
 
 def generate_relationship_json(
     topo_df=None, save=True, output_data_path=None, output_json_file_name=None, output_csv_file_name=None
@@ -331,7 +330,7 @@ def plot_ts(ts_df=None, \
         )
 
     if plot_results:
-        for j in tqdm(range(df_res_label_eval.shape[0]-1)):
+        for j in range(df_res_label_eval.shape[0]-1):
             confusion = df_res_label_eval.iloc[j]['confusion']
             if confusion == 'TN':
                 vrect_color = 'green'
