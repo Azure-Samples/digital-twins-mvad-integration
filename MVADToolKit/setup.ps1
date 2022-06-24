@@ -42,9 +42,13 @@ if (-not((Get-InstalledModule "Az") -and (Get-InstalledModule "Az.Synapse"))) {
 # Import Az.Synapse module
 Import-Module Az.Synapse
 
-# Login AZ account and set subscription
+# Login AZ account, set subscription and register RP
 Connect-AzAccount
 Select-AzSubscription -SubscriptionId $SubscriptionId
+if ((Register-AzResourceProvider -ProviderNamespace Microsoft.Synapse).RegistrationState -eq "Registering") {
+    Write-Information "Registering Microsoft.Synapse..." -InformationAction Continue
+    Start-Sleep -Seconds 20
+}
 
 # Set Qualifier to avoid existing names
 $random = (-Join ((0x30..0x39) + ( 0x61..0x7A) | Get-Random -Count 8  | % {[char]$_}))
