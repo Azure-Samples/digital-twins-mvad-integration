@@ -95,3 +95,8 @@ See the [toolkit's user-guide](./MVADToolkit/README.md/#user-guide), for the det
   - [ADT ADX plugin](https://docs.microsoft.com/en-us/azure/digital-twins/concepts-data-explorer-plugin)
   - [ADT Data History](https://docs.microsoft.com/en-us/azure/digital-twins/how-to-use-data-history?tabs=cli)
 - Cognitive services' Anomaly Detector resources(https://docs.microsoft.com/en-us/azure/cognitive-services/anomaly-detector/overview-multivariate) 
+
+<br>
+
+## Contributors
+Contributors also include gantonius.
