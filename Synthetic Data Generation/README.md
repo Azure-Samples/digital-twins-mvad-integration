@@ -10,11 +10,12 @@ Note that the synthetic data generation pipeline additionally provides generated
 # Synthetic Data Generation
 
 ## To run
-Follow this 4-step process:
-- Step1: Define DTDL models in the folder `./data/models_json/`.
-- Step2: Provide twin graph topology in the folder `./data/topology_json/`.
-- Step3: Specify configurations in the yaml file `./src/config.yaml`.
-- Step4: Run the main file: `python ./src/main.py`.
+Follow this 5-step process:
+- Step1: Install necessary packages: `pip install -r requirements.txt` 
+- Step2: Define DTDL models in the folder `./data/models_json/`.
+- Step3: Provide twin graph topology in the folder `./data/topology_json/`.
+- Step4: Specify configurations in the yaml file `./src/config.yaml`.
+- Step5: Run the main file: `python ./src/main.py`.
 
 <br>
 
