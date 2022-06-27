@@ -63,11 +63,12 @@ This project provides the following features:
 ### Installation
 
 - Clone this repo
-- Provision the required resources (See [./MVADToolkit/README.md](./MVADToolkit/README.md/#about) for more info):
+- Auto-provision the required Azure resources (See [./MVADToolkit/README.md](./MVADToolkit/README.md/#about) for more info):
 
   - Determine the resources parameters for the Powershell setup script and run the script.
-  - Run the PowerShell setup script. This will take 5-10 mins.
-  ![synapse resources](./media/Synapse-resources.png)
+  - Run the PowerShell setup script to auto-provision the resources. This will take 5-10 mins.
+
+    ![synapse resources](./media/Synapse-resources.png)
 - If you are bringing in your own ADT instance, ensure there is an appropriate time-series data source for your MVAD analysis in the ADX table. If you do not have one, set up a sample one according to the [`Synthetic Data Generation` folder](./Synthetic%20Data%20Generation/README.md/#Intro).
 
 <br>
@@ -94,7 +95,7 @@ See the [toolkit's user-guide](./MVADToolkit/README.md/#user-guide), for the det
   - [ADT query](https://docs.microsoft.com/en-us/azure/digital-twins/how-to-query-graph)
   - [ADT ADX plugin](https://docs.microsoft.com/en-us/azure/digital-twins/concepts-data-explorer-plugin)
   - [ADT Data History](https://docs.microsoft.com/en-us/azure/digital-twins/how-to-use-data-history?tabs=cli)
-- Cognitive services' Anomaly Detector resources(https://docs.microsoft.com/en-us/azure/cognitive-services/anomaly-detector/overview-multivariate) 
+- Cognitive services' Anomaly Detector resources (https://docs.microsoft.com/en-us/azure/cognitive-services/anomaly-detector/overview-multivariate) 
 
 <br>
 
