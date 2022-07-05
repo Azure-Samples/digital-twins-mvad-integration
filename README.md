@@ -18,7 +18,7 @@ urlFragment: adt-mvad-integration
 
 Azure Digital Twins Multivariate Anomaly Detection Toolkit is a sample project to showcase a low-code integration of [Azure Digital Twins](https://docs.microsoft.com/en-us/azure/digital-twins/overview) with [Azure AI and Cognitive Services' Anomaly Detector](https://azure.microsoft.com/en-us/services/cognitive-services/anomaly-detector/), an advanced AI solution to help identify abnormal operations or defective assets in near real-time.
 
-This integration toolkit leverages [Azure Data Explorer (ADX)](https://docs.microsoft.com/en-us/azure/data-explorer/data-explorer-overview) for data egress, and [Synapse Analytics](https://docs.microsoft.com/en-us/azure/synapse-analytics/overview-what-is) as the UI platform to host and run the toolkit code. ADT users can thus easily onboard and quickly connect to a downstream AI/ML solution. The goal of this toolkit is to allow ADT users to easily leverage the power of the twin graph, with historized time-series data, to identify anomalies in modelled environments. This is done by:
+This integration toolkit leverages [Azure Data Explorer (ADX)](https://docs.microsoft.com/en-us/azure/data-explorer/data-explorer-overview) for data egress, and [Synapse Analytics](https://docs.microsoft.com/en-us/azure/synapse-analytics/overview-what-is) as the UI platform to host and run the toolkit code. ADT users can thus easily onboard and quickly connect to a downstream AI/ML solution. The goal of this toolkit is to allow ADT users to easily leverage the power of the twin graph, with historized time-series data, to identify anomalies in modelled environments. To do so, the toolkit provides a workflow for training multiple Multivariate Anomaly Detector models for several scenario analyses, based on historical digital twin data. It then leverages the trained models to detect multivariate anomalies in modeled Azure Digital Twins environments, in near real-time. This is done by:
 - Defining one or more scenarios:
   - [Querying the twin graph](https://docs.microsoft.com/en-us/azure/digital-twins/how-to-query-graph) to provide a scenario's wanted **context** by leveraging ADT's ADX plugin,
   - Selecting the target properties in the scenario, i.e. the multiple variables, to later **analyze all together in a multivariate** fashion,
@@ -32,7 +32,7 @@ This integration toolkit leverages [Azure Data Explorer (ADX)](https://docs.micr
 ## Features
 This project provides the following features:
 
-* ADT-MVAD toolkit (See [./MVADToolkit/README.md](./MVADToolkit/README.md/#about) for more info):
+* ADT-MVAD toolkit (See [the toolkit guide](./MVADToolkit/README.md/#about) (./MVADToolkit/README.md/#about) for more info):
   - Automatic onboarding: automatic provisioning and linking of the necessary Azure resources done through a Powershell script (`./MVADToolkit/setup.ps`). 
   - Synapse artifacts 
     - Configurations are provided for Synapse workflow: the training and inference pipelines to define scenarios through user-input, help orchestrate and pass meta-data between training and inference, and surface any errors.
