@@ -32,7 +32,7 @@ This integration toolkit leverages [Azure Data Explorer (ADX)](https://docs.micr
 ## Features
 This project provides the following features:
 
-* ADT-MVAD toolkit (See [the toolkit guide](./MVADToolkit/README.md/#about) (./MVADToolkit/README.md/#about) for more info):
+* ADT-MVAD toolkit (See [the toolkit guide](./MVADToolKit/README.md/#about) for more info):
   - Automatic onboarding: automatic provisioning and linking of the necessary Azure resources done through a Powershell script (`./MVADToolkit/setup.ps`). 
   - Synapse artifacts 
     - Configurations are provided for Synapse workflow: the training and inference pipelines to define scenarios through user-input, help orchestrate and pass meta-data between training and inference, and surface any errors.
@@ -63,7 +63,7 @@ This project provides the following features:
 ### Installation
 
 - Clone this repo
-- Auto-provision the required Azure resources (See [./MVADToolkit/README.md](./MVADToolkit/README.md/#about) for more info):
+- Auto-provision the required Azure resources (See [toolkit guide](./MVADToolKit/README.md/#about) for more info):
 
   - Determine the resources parameters for the Powershell setup script and run the script.
   - Run the PowerShell setup script to auto-provision the resources. This will take 5-10 mins.
